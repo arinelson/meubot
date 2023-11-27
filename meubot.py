@@ -1,6 +1,6 @@
 import logging
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext, UpdateQueue
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+import sqlite3
 
 # Configuração de logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -11,17 +11,17 @@ TOKEN = "6942272197:AAHQ3XxW-ddCO8SG4-19dk-hkgAgt6DOVs"
 DATABASE = "database.db"
 
 # Funções
-def handle_help(update: Update, context: CallbackContext):
+def handle_help(update, context):
     chat_id = update.effective_chat.id
     context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
     context.bot.send_message(chat_id, "/ajuda - Exibe esta mensagem de ajuda")
     context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador")
 
-def handle_contact(update: Update, context: CallbackContext):
+def handle_contact(update, context):
     chat_id = update.effective_chat.id
     context.bot.send_message(chat_id, "Olá, administrador. Estou precisando de ajuda.")
 
-def handle_message(update: Update, context: CallbackContext):
+def handle_message(update, context):
     chat_id = update.effective_chat.id
     message = update.message.text
 
@@ -54,13 +54,13 @@ def handle_message(update: Update, context: CallbackContext):
         context.bot.send_message(chat_id, "Olá, {}! {}".format(name, message), parse_mode="html", disable_web_page_preview=True)
 
 # Inicia o bot
-updater = Updater(token=TOKEN, update_queue=UpdateQueue())
+updater = Updater(token=TOKEN)
 dispatcher = updater.dispatcher
 
 # Adiciona os handlers
 dispatcher.add_handler(CommandHandler("ajuda", handle_help))
 dispatcher.add_handler(CommandHandler("contato", handle_contact))
-dispatcher.add_handler(MessageHandler(Filters.text, handle_message))
+dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
 
 # Inicia o polling
 updater.start_polling()
