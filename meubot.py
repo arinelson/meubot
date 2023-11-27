@@ -1,5 +1,5 @@
 # Importações
-from telegram.ext import Updater, CommandHandler, MessageHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import sqlite3
 
 # Variáveis globais
@@ -30,15 +30,16 @@ def handle_message(update, context):
             handle_contact(update, context)
     else:
         # Verifica se o usuário já está cadastrado no banco de dados
+        user = update.effective_user
+        name = user.first_name
         connection = sqlite3.connect(DATABASE)
         cursor = connection.cursor()
         cursor.execute("SELECT name FROM users WHERE chat_id = ?", (chat_id,))
-        name = cursor.fetchone()
+        result = cursor.fetchone()
         connection.close()
 
         # Se o usuário não estiver cadastrado, cadastra-o no banco de dados
-        if name is None:
-            name = update.effective_chat.first_name
+        if result is None:
             connection = sqlite3.connect(DATABASE)
             cursor = connection.cursor()
             cursor.execute("INSERT INTO users (chat_id, name) VALUES (?, ?)", (chat_id, name))
