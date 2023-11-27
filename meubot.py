@@ -1,5 +1,6 @@
 # Importações
-from telegram.ext import Updater, CommandHandler, MessageHandler
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import sqlite3
 
 # Restante do código...
@@ -19,7 +20,7 @@ def handle_contact(update, context):
     chat_id = update.effective_chat.id
     context.bot.send_message(chat_id, "Olá, administrador. Estou precisando de ajuda.")
 
-def handle_message(update, context):
+def handle_message(update: Update, context: CallbackContext):
     chat_id = update.effective_chat.id
     message = update.message.text
 
@@ -52,13 +53,13 @@ def handle_message(update, context):
         context.bot.send_message(chat_id, "Olá, {}! {}".format(name, message), parse_mode="html", disable_web_page_preview=True)
 
 # Inicia o bot
-updater = Updater(token=TOKEN, use_context=True)
+updater = Updater(token=TOKEN)
 dispatcher = updater.dispatcher
 
 # Adiciona os handlers
 dispatcher.add_handler(CommandHandler("ajuda", handle_help))
 dispatcher.add_handler(CommandHandler("contato", handle_contact))
-dispatcher.add_handler(MessageHandler(callback=handle_message, filters=~Filters.command))  
+dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
 
 # Inicia o polling
 updater.start_polling()
