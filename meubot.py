@@ -1,6 +1,8 @@
 # Importações
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler
 import sqlite3
+
+# Restante do código...
 
 # Variáveis globais
 TOKEN = "6942272197:AAHQ3XxW-ddCO8SG4-19dk-hkgAgt6DOVs"
@@ -54,9 +56,11 @@ updater = Updater(token=TOKEN)
 dispatcher = updater.dispatcher
 
 # Adiciona os handlers
+# Adiciona os handlers
 dispatcher.add_handler(CommandHandler("ajuda", handle_help))
 dispatcher.add_handler(CommandHandler("contato", handle_contact))
-dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))  # Alteração aqui
+dispatcher.add_handler(MessageHandler(callback=handle_message, filters=~Filters.command))  
+
 
 # Inicia o polling
 updater.start_polling()
