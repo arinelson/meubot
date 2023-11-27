@@ -49,5 +49,4 @@ def handle_message(update, context):
 
 # Inicia o bot
 bot = telegram.Bot(token=TOKEN)
-#bot.on_message(handle_message)
-bot.start_polling()
+bot.polling()
