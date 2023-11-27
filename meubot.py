@@ -1,7 +1,6 @@
 import logging
-from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
-import sqlite3  # Adicione esta linha para importar o módulo sqlite3
+import sqlite3
 
 # Configuração de logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -55,7 +54,7 @@ def handle_message(update, context):
         context.bot.send_message(chat_id, "Olá, {}! {}".format(name, message), parse_mode="html", disable_web_page_preview=True)
 
 # Inicia o bot
-updater = Updater(token=TOKEN, update_queue=UpdateQueue())
+updater = Updater(token=TOKEN)
 dispatcher = updater.dispatcher
 
 # Adiciona os handlers
