@@ -1,5 +1,5 @@
 # Importações
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, telegram.ext.filters
 import sqlite3
 
 # Variáveis globais
@@ -56,7 +56,7 @@ dispatcher = updater.dispatcher
 # Adiciona os handlers
 dispatcher.add_handler(CommandHandler("ajuda", handle_help))
 dispatcher.add_handler(CommandHandler("contato", handle_contact))
-dispatcher.add_handler(MessageHandler(Filters.text, handle_message))
+dispatcher.add_handler(MessageHandler(telegram.ext.filters.text, handle_message))
 
 # Inicia o polling
 updater.start_polling()
