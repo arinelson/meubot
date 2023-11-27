@@ -10,6 +10,21 @@ logger = logging.getLogger(__name__)
 TOKEN = "6942272197:AAHQ3XxW-ddCO8SG4-1W9dk-hkgAgt6DOVs"
 DATABASE = "database.db"
 
+# Função para criar o banco de dados e a tabela
+def create_database():
+    connection = sqlite3.connect(DATABASE)
+    cursor = connection.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            chat_id INTEGER UNIQUE,
+            name TEXT
+        )
+    ''')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_chat_id ON users(chat_id)')
+    connection.commit()
+    connection.close()
+
 # Funções
 def handle_help(update, context):
     chat_id = update.effective_chat.id
@@ -52,6 +67,9 @@ def handle_message(update, context):
 
         # Envia uma mensagem de resposta ao usuário
         context.bot.send_message(chat_id, "Olá, {}! {}".format(name, message), parse_mode="html", disable_web_page_preview=True)
+
+# Chama a função para criar o banco de dados
+create_database()
 
 # Inicia o bot
 updater = Updater(token=TOKEN)
