@@ -38,7 +38,7 @@ def handle_message(update, context):
 
         # Se o usuário não estiver cadastrado, cadastra-o no banco de dados
         if name is None:
-            name = update.message.from_user.first_name
+            name = update.effective_chat.first_name
             connection = sqlite3.connect(DATABASE)
             cursor = connection.cursor()
             cursor.execute("INSERT INTO users (chat_id, name) VALUES (?, ?)", (chat_id, name))
