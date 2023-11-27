@@ -1,9 +1,11 @@
-# Importações
+import logging
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import sqlite3
 
-# Restante do código...
+# Configuração de logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Variáveis globais
 TOKEN = "6942272197:AAHQ3XxW-ddCO8SG4-19dk-hkgAgt6DOVs"
@@ -64,4 +66,3 @@ dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_me
 # Inicia o polling
 updater.start_polling()
 updater.idle()
-
