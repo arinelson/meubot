@@ -1,7 +1,6 @@
-# Importações
 import logging
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext
+from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext, UpdateQueue
 
 # Configuração de logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -55,7 +54,7 @@ def handle_message(update: Update, context: CallbackContext):
         context.bot.send_message(chat_id, "Olá, {}! {}".format(name, message), parse_mode="html", disable_web_page_preview=True)
 
 # Inicia o bot
-updater = Updater(TOKEN)  # Remove the `token` keyword argument
+updater = Updater(token=TOKEN, update_queue=UpdateQueue())
 dispatcher = updater.dispatcher
 
 # Adiciona os handlers
