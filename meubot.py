@@ -1,3 +1,4 @@
+# Importações
 import logging
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext
@@ -11,13 +12,13 @@ TOKEN = "6942272197:AAHQ3XxW-ddCO8SG4-19dk-hkgAgt6DOVs"
 DATABASE = "database.db"
 
 # Funções
-def handle_help(update, context):
+def handle_help(update: Update, context: CallbackContext):
     chat_id = update.effective_chat.id
     context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
     context.bot.send_message(chat_id, "/ajuda - Exibe esta mensagem de ajuda")
     context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador")
 
-def handle_contact(update, context):
+def handle_contact(update: Update, context: CallbackContext):
     chat_id = update.effective_chat.id
     context.bot.send_message(chat_id, "Olá, administrador. Estou precisando de ajuda.")
 
@@ -54,7 +55,7 @@ def handle_message(update: Update, context: CallbackContext):
         context.bot.send_message(chat_id, "Olá, {}! {}".format(name, message), parse_mode="html", disable_web_page_preview=True)
 
 # Inicia o bot
-updater = Updater(token=TOKEN)
+updater = Updater(TOKEN)  # Remove the `token` keyword argument
 dispatcher = updater.dispatcher
 
 # Adiciona os handlers
