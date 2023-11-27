@@ -7,7 +7,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 # Variáveis globais
-TOKEN = "6942272197:AAHQ3XxW-ddCO8SG4-19dk-hkgAgt6DOVs"
+TOKEN = "6942272197:AAHQ3XxW-ddCO8SG4-1W9dk-hkgAgt6DOVs"
 DATABASE = "database.db"
 
 # Funções
