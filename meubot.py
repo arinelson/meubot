@@ -52,16 +52,15 @@ def handle_message(update, context):
         context.bot.send_message(chat_id, "Olá, {}! {}".format(name, message), parse_mode="html", disable_web_page_preview=True)
 
 # Inicia o bot
-updater = Updater(token=TOKEN)
+updater = Updater(token=TOKEN, use_context=True)
 dispatcher = updater.dispatcher
 
-# Adiciona os handlers
 # Adiciona os handlers
 dispatcher.add_handler(CommandHandler("ajuda", handle_help))
 dispatcher.add_handler(CommandHandler("contato", handle_contact))
 dispatcher.add_handler(MessageHandler(callback=handle_message, filters=~Filters.command))  
 
-
 # Inicia o polling
 updater.start_polling()
 updater.idle()
+
