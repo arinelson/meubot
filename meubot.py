@@ -1,6 +1,5 @@
 import logging
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
-import sqlite3
 from datetime import datetime
 import pytz
 
@@ -10,35 +9,8 @@ logger = logging.getLogger(__name__)
 
 # Variáveis globais
 TOKEN = "6942272197:AAE8kJKRkz_y3CbOgGzXl_ocVlnrvG51MM0"
-DATABASE = "database.db"
 
-# Função para criar o banco de dados e a tabela
-def create_database():
-    connection = sqlite3.connect(DATABASE)
-    cursor = connection.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            chat_id INTEGER UNIQUE,
-            name TEXT
-        )
-    ''')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_chat_id ON users(chat_id)')
-    connection.commit()
-    connection.close()
-
-# Funções
-def handle_help(update, context):
-    chat_id = update.effective_chat.id
-    context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
-    context.bot.send_message(chat_id, "/ajuda - Exibe esta mensagem de ajuda")
-    context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador")
-    context.bot.send_message(chat_id, "/horario - Quero saber a hora atual")
-
-def handle_contact(update, context):
-    chat_id = update.effective_chat.id
-    context.bot.send_message(chat_id, "Olá, administrador. Estou precisando de ajuda.")
-
+# Função para exibir a hora e o fuso horário atual
 def handle_horario(update, context):
     chat_id = update.effective_chat.id
     name = update.effective_user.first_name
@@ -47,36 +19,47 @@ def handle_horario(update, context):
     now = datetime.now()
     tz = pytz.timezone('America/Sao_Paulo')  # Você pode ajustar o fuso horário conforme necessário
     hora_atual = now.astimezone(tz).strftime("%H:%M:%S")
-    fuso_horario = tz.zone
+    periodo_dia = get_periodo_dia(now.hour)
+    localizacao = get_localizacao(now, tz)
 
     # Envia a mensagem com a hora e o fuso horário
-    context.bot.send_message(chat_id, "{}, nesse exato momento são {} no fuso horário {}.".format(name, hora_atual, fuso_horario))
+    context.bot.send_message(chat_id, "{}, agora são {} {} do {}.".format(name, hora_atual, periodo_dia, localizacao))
 
-def handle_message(update, context):
+# Funções de saudação e ajuda
+def handle_greeting(update, context):
     chat_id = update.effective_chat.id
     name = update.effective_user.first_name
 
-    # Enviando a mensagem de saudação personalizada
+    # Enviando a mensagem de saudação personalizada com as opções de atendimento
     context.bot.send_message(chat_id, "Oi {}, se você está me acionando é porque precisa de alguma ajuda, não é mesmo?".format(name), parse_mode="html", disable_web_page_preview=True)
-
-    # Enviando mensagem com as opções de comando
     context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
     context.bot.send_message(chat_id, "/ajuda - Exibe esta mensagem de ajuda")
     context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador")
     context.bot.send_message(chat_id, "/horario - Quero saber a hora atual")
 
-    # Verifica se a mensagem é um comando
-    if update.message.text.startswith("/"):
-        # Verifica qual comando foi enviado
-        if update.message.text == "/ajuda":
-            handle_help(update, context)
-        elif update.message.text == "/contato":
-            handle_contact(update, context)
-        elif update.message.text == "/horario":
-            handle_horario(update, context)
+# Função de ajuda
+def handle_help(update, context):
+    chat_id = update.effective_chat.id
+    context.bot.send_message(chat_id, "Opa, então você quer uma ajuda específica, né?")
 
-# Chama a função para criar o banco de dados
-create_database()
+# Função de contato
+def handle_contact(update, context):
+    chat_id = update.effective_chat.id
+    context.bot.send_message(chat_id, "Nesse caso, é melhor você entrar em contato com o admin: @arinelson.")
+
+# Função para obter o período do dia
+def get_periodo_dia(hour):
+    if 5 <= hour < 12:
+        return "da manhã"
+    elif 12 <= hour < 18:
+        return "da tarde"
+    else:
+        return "da noite"
+
+# Função para obter a localização com base no fuso horário
+def get_localizacao(now, tz):
+    localizacao = tz.zone
+    return localizacao
 
 # Inicia o bot
 updater = Updater(token=TOKEN)
@@ -86,7 +69,7 @@ dispatcher = updater.dispatcher
 dispatcher.add_handler(CommandHandler("ajuda", handle_help))
 dispatcher.add_handler(CommandHandler("contato", handle_contact))
 dispatcher.add_handler(CommandHandler("horario", handle_horario))
-dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
+dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_greeting))
 
 # Inicia o polling
 updater.start_polling()
