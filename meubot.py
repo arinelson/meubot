@@ -45,7 +45,7 @@ def handle_help(update, context):
 # Função de contato
 def handle_contact(update, context):
     chat_id = update.effective_chat.id
-    context.bot.send_message(chat_id, "Nesse caso, é melhor você falar com o boss @arinelson.")
+    context.bot.send_message(chat_id, "Nesse caso, é melhor você falar com o boss, @arinelson.")
 
 # Função para obter o período do dia
 def get_periodo_dia(hour):
