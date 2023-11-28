@@ -35,7 +35,7 @@ def handle_greeting(update, context):
     context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
     context.bot.send_message(chat_id, "/ajuda - Quero ajuda")
     context.bot.send_message(chat_id, "/contato - Fale com o chefe")
-    context.bot.send_message(chat_id, "/horario - Tô perdido na hora")
+    context.bot.send_message(chat_id, "/horario - Que horas são?")
 
 # Função de ajuda
 def handle_help(update, context):
