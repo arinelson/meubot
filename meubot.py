@@ -4,6 +4,10 @@ from datetime import datetime
 import pytz
 from cachetools import TTLCache
 
+# Constantes
+COMMAND_HORARIO = "horario"
+CACHE_KEY_HORARIO = "horario"
+
 # Configuração de logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -11,14 +15,15 @@ logger = logging.getLogger(__name__)
 # Variáveis globais
 TOKEN = "6942272197:AAE8kJKRkz_y3CbOgGzXl_ocVlnrvG51MM0"
 
-# Criação do cache com uma capacidade de 1 item e tempo de vida de 60 segundos
-cache = TTLCache(maxsize=1, ttl=30)
+# Criação do cache com uma capacidade de 1 item e tempo de vida de 5 segundos
+cache = TTLCache(maxsize=1, ttl=5)
 
 # Função para enviar mensagens
 def enviar_mensagem(chat_id, mensagem, context):
     try:
         context.bot.send_message(chat_id, mensagem)
     except Exception as e:
+        # Tratamento de erro ao enviar mensagem
         logger.error(f"Erro ao enviar mensagem: {e}")
 
 # Função para exibir a hora e o fuso horário atual
@@ -29,31 +34,33 @@ def handle_horario(update, context):
     # Limpar cache antes de obter a resposta
     cache.clear()
 
-    # Verifica se a resposta está em cache
-    if "horario" in cache:
-        response = cache["horario"]
-    else:
-        try:
-            # Obtém a hora e o fuso horário atual
-            now = datetime.now()
-            user_location = update.effective_user.location
-            tz = pytz.timezone(user_location.timezone) if user_location else pytz.timezone('America/Maceio')
-            hora_atual = now.astimezone(tz).strftime("%H:%M:%S")
-            periodo_dia = get_periodo_dia(now.hour)
+    try:
+        # Obtém a hora e o fuso horário atual
+        now = datetime.now()
+        user_location = update.effective_user.location
 
-            # Obtém a localização do usuário
-            pais = user_location.country_code if user_location else "Brasil"
-            estado = user_location.state if user_location else "Alagoas"
-            municipio = user_location.city if user_location else "Maceió"
+        # Tratamento de localização nula
+        if user_location is None:
+            raise ValueError("Localização do usuário não disponível.")
 
-            # Monta a resposta
-            response = f"{name}, agora são {hora_atual} {periodo_dia} do {pais}, {estado}, {municipio}."
+        tz = pytz.timezone(user_location.timezone)
+        hora_atual = now.astimezone(tz).strftime("%H:%M:%S")
+        periodo_dia = get_periodo_dia(now.hour)
 
-            # Armazena a resposta no cache
-            cache["horario"] = response
-        except Exception as e:
-            logger.error(f"Erro ao processar o horário: {e}")
-            response = "Desculpe, ocorreu um erro ao obter o horário."
+        # Obtém a localização do usuário
+        pais = user_location.country_code
+        estado = user_location.state
+        municipio = user_location.city
+
+        # Monta a resposta
+        response = f"{name}, agora são {hora_atual} {periodo_dia} do {pais}, {estado}, {municipio}."
+
+        # Armazena a resposta no cache
+        cache[CACHE_KEY_HORARIO] = response
+    except Exception as e:
+        # Tratamento de erro ao processar o horário
+        logger.error(f"Erro ao processar o horário: {e}")
+        response = "Desculpe, ocorreu um erro ao obter o horário."
 
     # Envia a mensagem com a hora e o fuso horário
     enviar_mensagem(chat_id, response, context)
@@ -70,7 +77,7 @@ def handle_greeting(update, context):
     opcoes = [
         "/ajuda - Tô ferrado(a)",
         "/contato - Quero falar com o boss",
-        "/horario - Tô perdido na hora",
+        f"/{COMMAND_HORARIO} - Tô perdido na hora",
     ]
 
     # Envia as mensagens
@@ -102,7 +109,7 @@ updater = Updater(token=TOKEN)
 dispatcher = updater.dispatcher
 
 # Adiciona os handlers
-dispatcher.add_handler(CommandHandler("horario", handle_horario))
+dispatcher.add_handler(CommandHandler(COMMAND_HORARIO, handle_horario))
 dispatcher.add_handler(CommandHandler("ajuda", handle_ajuda))
 dispatcher.add_handler(CommandHandler("contato", handle_contato))
 # Restante dos handlers...
