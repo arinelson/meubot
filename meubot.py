@@ -44,6 +44,11 @@ def handle_message(update, context):
     # Enviando a mensagem de saudação personalizada
     context.bot.send_message(chat_id, "Oi {}, se você está me acionando é porque precisa de alguma ajuda, não é mesmo?".format(name), parse_mode="html", disable_web_page_preview=True)
 
+    # Enviando mensagem com as opções de comando
+    context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
+    context.bot.send_message(chat_id, "/ajuda - Exibe esta mensagem de ajuda")
+    context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador")
+
     # Verifica se a mensagem é um comando
     if update.message.text.startswith("/"):
         # Verifica qual comando foi enviado
@@ -51,11 +56,6 @@ def handle_message(update, context):
             handle_help(update, context)
         elif update.message.text == "/contato":
             handle_contact(update, context)
-    else:
-        # Enviando mensagem com as opções de comando após a mensagem de saudação
-        context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
-        context.bot.send_message(chat_id, "/ajuda - Exibe esta mensagem de ajuda")
-        context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador")
 
 # Chama a função para criar o banco de dados
 create_database()
