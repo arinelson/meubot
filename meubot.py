@@ -69,7 +69,7 @@ def handle_message(update, context):
             connection.close()
 
         # Envia uma mensagem de resposta ao usuário
-        context.bot.send_message(chat_id, "Olá, {}!".format(name), parse_mode="html", disable_web_page_preview=True)
+      #  context.bot.send_message(chat_id, "Olá, {}!".format(name), parse_mode="html", disable_web_page_preview=True)
 
 # Chama a função para criar o banco de dados
 create_database()
