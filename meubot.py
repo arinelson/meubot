@@ -12,16 +12,19 @@ logger = logging.getLogger(__name__)
 TOKEN = "6942272197:AAE8kJKRkz_y3CbOgGzXl_ocVlnrvG51MM0"
 
 # Criação do cache com uma capacidade de 1 item e tempo de vida de 60 segundos
-cache = TTLCache(maxsize=1, ttl=60)
+cache = TTLCache(maxsize=1, ttl=30)
 
 # Função para enviar mensagens
-def enviar_mensagem(chat_id, mensagem):
+def enviar_mensagem(chat_id, mensagem, context):
     context.bot.send_message(chat_id, mensagem)
 
 # Função para exibir a hora e o fuso horário atual
 def handle_horario(update, context):
     chat_id = update.effective_chat.id
     name = update.effective_user.first_name
+
+    # Limpar cache antes de obter a resposta
+    cache.clear()
 
     # Verifica se a resposta está em cache
     if "horario" in cache:
@@ -46,7 +49,7 @@ def handle_horario(update, context):
         cache["horario"] = response
 
     # Envia a mensagem com a hora e o fuso horário
-    enviar_mensagem(chat_id, response)
+    enviar_mensagem(chat_id, response, context)
 
 # Funções de saudação e ajuda
 def handle_greeting(update, context):
