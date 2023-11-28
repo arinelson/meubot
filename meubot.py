@@ -1,5 +1,5 @@
 import logging
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler
 import sqlite3
 
 # Configuração de logging
@@ -9,6 +9,9 @@ logger = logging.getLogger(__name__)
 # Variáveis globais
 TOKEN = "6942272197:AAE8kJKRkz_y3CbOgGzXl_ocVlnrvG51MM0"
 DATABASE = "database.db"
+
+# Estados da conversa
+START, HELP, CONTACT = range(3)
 
 # Função para criar o banco de dados e a tabela
 def create_database():
@@ -26,6 +29,21 @@ def create_database():
     connection.close()
 
 # Funções
+def start(update, context):
+    chat_id = update.effective_chat.id
+    # Acessando o primeiro nome do usuário
+    name = update.effective_user.first_name
+
+    # Enviando a mensagem de boas-vindas
+    context.bot.send_message(chat_id, "Oi {}, seja bem-vindo! Se você está me acionando é porque precisa de alguma ajuda, não é mesmo?".format(name), parse_mode="html", disable_web_page_preview=True)
+
+    # Enviando mensagem com as opções de comando
+    context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
+    context.bot.send_message(chat_id, "/ajuda - Exibe esta mensagem de ajuda")
+    context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador")
+
+    return START
+
 def handle_help(update, context):
     chat_id = update.effective_chat.id
     context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
@@ -41,13 +59,8 @@ def handle_message(update, context):
     # Acessando o primeiro nome do usuário
     name = update.effective_user.first_name
 
-    # Enviando a mensagem de saudação personalizada
+    # Enviando a mensagem de resposta ao usuário
     context.bot.send_message(chat_id, "Oi {}, se você está me acionando é porque precisa de alguma ajuda, não é mesmo?".format(name), parse_mode="html", disable_web_page_preview=True)
-
-    # Enviando mensagem com as opções de comando
-    context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
-    context.bot.send_message(chat_id, "/ajuda - Exibe esta mensagem de ajuda")
-    context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador")
 
     # Verifica se a mensagem é um comando
     if update.message.text.startswith("/"):
@@ -68,6 +81,7 @@ dispatcher = updater.dispatcher
 dispatcher.add_handler(CommandHandler("ajuda", handle_help))
 dispatcher.add_handler(CommandHandler("contato", handle_contact))
 dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
+dispatcher.add_handler(MessageHandler(Filters.status_update.new_chat_members, start))
 
 # Inicia o polling
 updater.start_polling()
