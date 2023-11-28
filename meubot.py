@@ -30,7 +30,7 @@ def handle_help(update, context):
     chat_id = update.effective_chat.id
     context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
     context.bot.send_message(chat_id, "/ajuda - Exibe esta mensagem de ajuda")
-    context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador:")
+    context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador: @arinelson")
 
 def handle_contact(update, context):
     chat_id = update.effective_chat.id
@@ -47,7 +47,7 @@ def handle_message(update, context):
     # Enviando mensagem com as opções de comando
     context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
     context.bot.send_message(chat_id, "/ajuda - Exibe esta mensagem de ajuda")
-    context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador: @arinelson")
+    context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador:")
 
     # Verifica se a mensagem é um comando
     if update.message.text.startswith("/"):
