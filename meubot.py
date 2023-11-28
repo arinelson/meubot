@@ -1,6 +1,8 @@
 import logging
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import sqlite3
+from datetime import datetime
+import pytz
 
 # Configuração de logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -30,15 +32,28 @@ def handle_help(update, context):
     chat_id = update.effective_chat.id
     context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
     context.bot.send_message(chat_id, "/ajuda - Exibe esta mensagem de ajuda")
-    context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador: @arinelson")
+    context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador")
+    context.bot.send_message(chat_id, "/horario - Quero saber a hora atual")
 
 def handle_contact(update, context):
     chat_id = update.effective_chat.id
     context.bot.send_message(chat_id, "Olá, administrador. Estou precisando de ajuda.")
 
+def handle_horario(update, context):
+    chat_id = update.effective_chat.id
+    name = update.effective_user.first_name
+
+    # Obtém a hora e o fuso horário atual
+    now = datetime.now()
+    tz = pytz.timezone('America/Sao_Paulo')  # Você pode ajustar o fuso horário conforme necessário
+    hora_atual = now.astimezone(tz).strftime("%H:%M:%S")
+    fuso_horario = tz.zone
+
+    # Envia a mensagem com a hora e o fuso horário
+    context.bot.send_message(chat_id, "{}, nesse exato momento são {} no fuso horário {}.".format(name, hora_atual, fuso_horario))
+
 def handle_message(update, context):
     chat_id = update.effective_chat.id
-    # Acessando o primeiro nome do usuário
     name = update.effective_user.first_name
 
     # Enviando a mensagem de saudação personalizada
@@ -47,7 +62,8 @@ def handle_message(update, context):
     # Enviando mensagem com as opções de comando
     context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
     context.bot.send_message(chat_id, "/ajuda - Exibe esta mensagem de ajuda")
-    context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador:")
+    context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador")
+    context.bot.send_message(chat_id, "/horario - Quero saber a hora atual")
 
     # Verifica se a mensagem é um comando
     if update.message.text.startswith("/"):
@@ -56,6 +72,8 @@ def handle_message(update, context):
             handle_help(update, context)
         elif update.message.text == "/contato":
             handle_contact(update, context)
+        elif update.message.text == "/horario":
+            handle_horario(update, context)
 
 # Chama a função para criar o banco de dados
 create_database()
@@ -67,6 +85,7 @@ dispatcher = updater.dispatcher
 # Adiciona os handlers
 dispatcher.add_handler(CommandHandler("ajuda", handle_help))
 dispatcher.add_handler(CommandHandler("contato", handle_contact))
+dispatcher.add_handler(CommandHandler("horario", handle_horario))
 dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
 
 # Inicia o polling
