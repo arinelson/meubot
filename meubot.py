@@ -2,32 +2,46 @@ import logging
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from datetime import datetime
 import pytz
+from cachetools import TTLCache
 
 # Configuração de logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Variáveis globais
-TOKEN = "6942272197:AAE8kJKRkz_y3CbOgGzXl_ocVlnrvG51MM0"
+TOKEN = "YOUR_BOT_TOKEN"
 
 # Informações específicas de localização
 PAIS = "Brasil"
 ESTADO = "Alagoas"
 MUNICIPIO = "Maceió"
 
+# Criação do cache com uma capacidade de 1 item e tempo de vida de 60 segundos
+cache = TTLCache(maxsize=1, ttl=60)
+
 # Função para exibir a hora e o fuso horário atual
 def handle_horario(update, context):
     chat_id = update.effective_chat.id
     name = update.effective_user.first_name
 
-    # Obtém a hora e o fuso horário atual
-    now = datetime.now()
-    tz = pytz.timezone('America/Maceio')  # Ajuste para o fuso horário de Maceió
-    hora_atual = now.astimezone(tz).strftime("%H:%M:%S")
-    periodo_dia = get_periodo_dia(now.hour)
+    # Verifica se a resposta está em cache
+    if "horario" in cache:
+        response = cache["horario"]
+    else:
+        # Obtém a hora e o fuso horário atual
+        now = datetime.now()
+        tz = pytz.timezone('America/Maceio')  # Ajuste para o fuso horário de Maceió
+        hora_atual = now.astimezone(tz).strftime("%H:%M:%S")
+        periodo_dia = get_periodo_dia(now.hour)
+
+        # Monta a resposta
+        response = "{}, agora são {} {} do {}, {}, {}.".format(name, hora_atual, periodo_dia, PAIS, ESTADO, MUNICIPIO)
+
+        # Armazena a resposta no cache
+        cache["horario"] = response
 
     # Envia a mensagem com a hora e o fuso horário
-    context.bot.send_message(chat_id, "{}, agora são {} {} do {}, {}, {}.".format(name, hora_atual, periodo_dia, PAIS, ESTADO, MUNICIPIO))
+    context.bot.send_message(chat_id, response)
 
 # Funções de saudação e ajuda
 def handle_greeting(update, context):
