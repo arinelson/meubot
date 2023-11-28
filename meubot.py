@@ -33,22 +33,19 @@ def handle_greeting(update, context):
     # Enviando a mensagem de saudação personalizada com as opções de atendimento
     context.bot.send_message(chat_id, "Oi {}, se você está me acionando é porque precisa de alguma ajuda, não é mesmo?".format(name), parse_mode="html", disable_web_page_preview=True)
     context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
-    context.bot.send_message(chat_id, "/ajuda - Exibe esta mensagem de ajuda")
-    context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador")
-    context.bot.send_message(chat_id, "/horario - Quero saber a hora atual")
+    context.bot.send_message(chat_id, "/ajuda - Quero ajuda")
+    context.bot.send_message(chat_id, "/contato - Fale com o chefe")
+    context.bot.send_message(chat_id, "/horario - Tô perdido na hora")
 
 # Função de ajuda
 def handle_help(update, context):
     chat_id = update.effective_chat.id
-    context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
-    context.bot.send_message(chat_id, "/ajuda - Exibe esta mensagem de ajuda")
-    context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador")
-    context.bot.send_message(chat_id, "/horario - Quero saber a hora atual")
-
+    context.bot.send_message(chat_id, "Opa,então você quer uma ajudinha, não é mesmo?")
+  
 # Função de contato
 def handle_contact(update, context):
     chat_id = update.effective_chat.id
-    context.bot.send_message(chat_id, "Olá, administrador. Estou precisando de ajuda.")
+    context.bot.send_message(chat_id, "Nesse caso, é melhor você falar com o boss @arinelson.")
 
 # Função para obter o período do dia
 def get_periodo_dia(hour):
