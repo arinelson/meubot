@@ -9,7 +9,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 # Variáveis globais
-TOKEN = "YOUR_BOT_TOKEN"
+TOKEN = "6942272197:AAE8kJKRkz_y3CbOgGzXl_ocVlnrvG51MM0"
 
 # Criação do cache com uma capacidade de 1 item e tempo de vida de 60 segundos
 cache = TTLCache(maxsize=1, ttl=30)
