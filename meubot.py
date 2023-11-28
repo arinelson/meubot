@@ -16,7 +16,10 @@ cache = TTLCache(maxsize=1, ttl=30)
 
 # Função para enviar mensagens
 def enviar_mensagem(chat_id, mensagem, context):
-    context.bot.send_message(chat_id, mensagem)
+    try:
+        context.bot.send_message(chat_id, mensagem)
+    except Exception as e:
+        logger.error(f"Erro ao enviar mensagem: {e}")
 
 # Função para exibir a hora e o fuso horário atual
 def handle_horario(update, context):
@@ -30,23 +33,27 @@ def handle_horario(update, context):
     if "horario" in cache:
         response = cache["horario"]
     else:
-        # Obtém a hora e o fuso horário atual
-        now = datetime.now()
-        user_location = update.effective_user.location
-        tz = pytz.timezone(user_location.timezone) if user_location else pytz.timezone('America/Maceio')
-        hora_atual = now.astimezone(tz).strftime("%H:%M:%S")
-        periodo_dia = get_periodo_dia(now.hour)
+        try:
+            # Obtém a hora e o fuso horário atual
+            now = datetime.now()
+            user_location = update.effective_user.location
+            tz = pytz.timezone(user_location.timezone) if user_location else pytz.timezone('America/Maceio')
+            hora_atual = now.astimezone(tz).strftime("%H:%M:%S")
+            periodo_dia = get_periodo_dia(now.hour)
 
-        # Obtém a localização do usuário
-        pais = user_location.country_code if user_location else "Brasil"
-        estado = user_location.state if user_location else "Alagoas"
-        municipio = user_location.city if user_location else "Maceió"
+            # Obtém a localização do usuário
+            pais = user_location.country_code if user_location else "Brasil"
+            estado = user_location.state if user_location else "Alagoas"
+            municipio = user_location.city if user_location else "Maceió"
 
-        # Monta a resposta
-        response = f"{name}, agora são {hora_atual} {periodo_dia} do {pais}, {estado}, {municipio}."
+            # Monta a resposta
+            response = f"{name}, agora são {hora_atual} {periodo_dia} do {pais}, {estado}, {municipio}."
 
-        # Armazena a resposta no cache
-        cache["horario"] = response
+            # Armazena a resposta no cache
+            cache["horario"] = response
+        except Exception as e:
+            logger.error(f"Erro ao processar o horário: {e}")
+            response = "Desculpe, ocorreu um erro ao obter o horário."
 
     # Envia a mensagem com a hora e o fuso horário
     enviar_mensagem(chat_id, response, context)
@@ -57,7 +64,7 @@ def handle_greeting(update, context):
     name = update.effective_user.first_name
 
     # Mensagem de saudação
-    saudacao = "Oi {name}, se você está me acionando é porque precisa de algo, não é mesmo?"
+    saudacao = f"Oi {name}, se você está me acionando é porque precisa de algo, não é mesmo?"
 
     # Mensagens de opções
     opcoes = [
@@ -67,19 +74,19 @@ def handle_greeting(update, context):
     ]
 
     # Envia as mensagens
-    enviar_mensagem(chat_id, saudacao)
+    enviar_mensagem(chat_id, saudacao, context)
     for opcao in opcoes:
-        enviar_mensagem(chat_id, opcao)
+        enviar_mensagem(chat_id, opcao, context)
 
 # Função de ajuda
-def handle_help(update, context):
+def handle_ajuda(update, context):
     chat_id = update.effective_chat.id
-    enviar_mensagem(chat_id, "Então você quer uma ajudinha, não é mesmo?")
+    enviar_mensagem(chat_id, "Precisa de uma ajudinha? Estou aqui para ajudar!")
 
 # Função de contato
-def handle_contact(update, context):
+def handle_contato(update, context):
     chat_id = update.effective_chat.id
-    enviar_mensagem(chat_id, "Poxa, tente lá e veja se o chefe te responde: @arinelson")
+    enviar_mensagem(chat_id, "Quer falar com o chefe? Tente lá: @arinelson", context)
 
 # Função para obter o período do dia
 def get_periodo_dia(hour):
@@ -96,6 +103,8 @@ dispatcher = updater.dispatcher
 
 # Adiciona os handlers
 dispatcher.add_handler(CommandHandler("horario", handle_horario))
+dispatcher.add_handler(CommandHandler("ajuda", handle_ajuda))
+dispatcher.add_handler(CommandHandler("contato", handle_contato))
 # Restante dos handlers...
 
 # Inicia o polling
