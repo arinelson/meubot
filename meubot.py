@@ -44,6 +44,11 @@ def handle_message(update, context):
     # Enviando a mensagem de saudação personalizada
     context.bot.send_message(chat_id, "Oi {}, se você está me acionando é porque precisa de alguma ajuda, não é mesmo?".format(name), parse_mode="html", disable_web_page_preview=True)
 
+    # Enviando mensagem com as opções de comando
+    context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
+    context.bot.send_message(chat_id, "/ajuda - Exibe esta mensagem de ajuda")
+    context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador")
+
     # Verifica se a mensagem é um comando
     if update.message.text.startswith("/"):
         # Verifica qual comando foi enviado
@@ -51,25 +56,6 @@ def handle_message(update, context):
             handle_help(update, context)
         elif update.message.text == "/contato":
             handle_contact(update, context)
-    else:
-        # Verifica se o usuário já está cadastrado no banco de dados
-        user = update.effective_user
-        connection = sqlite3.connect(DATABASE)
-        cursor = connection.cursor()
-        cursor.execute("SELECT name FROM users WHERE chat_id = ?", (chat_id,))
-        result = cursor.fetchone()
-        connection.close()
-
-        # Se o usuário não estiver cadastrado, cadastra-o no banco de dados
-        if result is None:
-            connection = sqlite3.connect(DATABASE)
-            cursor = connection.cursor()
-            cursor.execute("INSERT INTO users (chat_id, name) VALUES (?, ?)", (chat_id, name))
-            connection.commit()
-            connection.close()
-
-        # Envia uma mensagem de resposta ao usuário
-      #  context.bot.send_message(chat_id, "Olá, {}!".format(name), parse_mode="html", disable_web_page_preview=True)
 
 # Chama a função para criar o banco de dados
 create_database()
