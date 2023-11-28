@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 # Variáveis globais
 TOKEN = "6942272197:AAE8kJKRkz_y3CbOgGzXl_ocVlnrvG51MM0"
 
-# Criação do cache com uma capacidade de 1 item e tempo de vida de 30 segundos
-cache = TTLCache(maxsize=1, ttl=30)
+# Criação do cache com uma capacidade de 1 item e tempo de vida de 6 segundos
+cache = TTLCache(maxsize=1, ttl=6)
 
 # Função para enviar mensagens
 def enviar_mensagem(chat_id, mensagem, context):
