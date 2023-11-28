@@ -1,5 +1,5 @@
 import logging
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from datetime import datetime
 import pytz
 from cachetools import TTLCache
@@ -10,13 +10,6 @@ logger = logging.getLogger(__name__)
 
 # Variáveis globais
 TOKEN = "6942272197:AAE8kJKRkz_y3CbOgGzXl_ocVlnrvG51MM0"
-
-# Informações específicas de localização
-localizacao = {
-    "PAIS": "Brasil",
-    "ESTADO": "Alagoas",
-    "MUNICIPIO": "Maceió",
-}
 
 # Criação do cache com uma capacidade de 1 item e tempo de vida de 60 segundos
 cache = TTLCache(maxsize=1, ttl=60)
@@ -36,12 +29,18 @@ def handle_horario(update, context):
     else:
         # Obtém a hora e o fuso horário atual
         now = datetime.now()
-        tz = pytz.timezone('America/Maceio')  # Ajuste para o fuso horário de Maceió
+        user_location = update.effective_user.location
+        tz = pytz.timezone(user_location.timezone) if user_location else pytz.timezone('America/Maceio')
         hora_atual = now.astimezone(tz).strftime("%H:%M:%S")
         periodo_dia = get_periodo_dia(now.hour)
 
+        # Obtém a localização do usuário
+        pais = user_location.country_code if user_location else "Brasil"
+        estado = user_location.state if user_location else "Alagoas"
+        municipio = user_location.city if user_location else "Maceió"
+
         # Monta a resposta
-        response = f"{name}, agora são {hora_atual} {periodo_dia} do {localizacao['PAIS']}, {localizacao['ESTADO']}, {localizacao['MUNICIPIO']}."
+        response = f"{name}, agora são {hora_atual} {periodo_dia} do {pais}, {estado}, {municipio}."
 
         # Armazena a resposta no cache
         cache["horario"] = response
@@ -93,10 +92,8 @@ updater = Updater(token=TOKEN)
 dispatcher = updater.dispatcher
 
 # Adiciona os handlers
-dispatcher.add_handler(CommandHandler("ajuda", handle_help))
-dispatcher.add_handler(CommandHandler("contato", handle_contact))
 dispatcher.add_handler(CommandHandler("horario", handle_horario))
-dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_greeting))
+# Restante dos handlers...
 
 # Inicia o polling
 updater.start_polling()
