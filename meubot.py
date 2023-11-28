@@ -10,6 +10,11 @@ logger = logging.getLogger(__name__)
 # Variáveis globais
 TOKEN = "6942272197:AAE8kJKRkz_y3CbOgGzXl_ocVlnrvG51MM0"
 
+# Informações específicas de localização
+PAIS = "Brasil"
+ESTADO = "Alagoas"
+MUNICIPIO = "Maceió"
+
 # Função para exibir a hora e o fuso horário atual
 def handle_horario(update, context):
     chat_id = update.effective_chat.id
@@ -20,10 +25,9 @@ def handle_horario(update, context):
     tz = pytz.timezone('America/Maceio')  # Ajuste para o fuso horário de Maceió
     hora_atual = now.astimezone(tz).strftime("%H:%M:%S")
     periodo_dia = get_periodo_dia(now.hour)
-    localizacao = get_localizacao(tz)
 
     # Envia a mensagem com a hora e o fuso horário
-    context.bot.send_message(chat_id, "{}, agora são {} {} do {}.".format(name, hora_atual, periodo_dia, localizacao))
+    context.bot.send_message(chat_id, "{}, agora são {} {} do {}, {}, {}.".format(name, hora_atual, periodo_dia, PAIS, ESTADO, MUNICIPIO))
 
 # Funções de saudação e ajuda
 def handle_greeting(update, context):
@@ -55,11 +59,6 @@ def get_periodo_dia(hour):
         return "da tarde"
     else:
         return "da noite"
-
-# Função para obter a localização com base no fuso horário
-def get_localizacao(tz):
-    localizacao = tz.zone
-    return localizacao
 
 # Inicia o bot
 updater = Updater(token=TOKEN)
