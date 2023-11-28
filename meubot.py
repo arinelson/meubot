@@ -40,12 +40,15 @@ def handle_greeting(update, context):
 # Função de ajuda
 def handle_help(update, context):
     chat_id = update.effective_chat.id
-    context.bot.send_message(chat_id, "Opa, então você quer uma ajuda específica, né?")
+    context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
+    context.bot.send_message(chat_id, "/ajuda - Exibe esta mensagem de ajuda")
+    context.bot.send_message(chat_id, "/contato - Envia uma mensagem para o administrador")
+    context.bot.send_message(chat_id, "/horario - Quero saber a hora atual")
 
 # Função de contato
 def handle_contact(update, context):
     chat_id = update.effective_chat.id
-    context.bot.send_message(chat_id, "Nesse caso, é melhor você entrar em contato com o admin: @arinelson.")
+    context.bot.send_message(chat_id, "Olá, administrador. Estou precisando de ajuda.")
 
 # Função para obter o período do dia
 def get_periodo_dia(hour):
