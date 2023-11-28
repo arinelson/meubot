@@ -17,10 +17,10 @@ def handle_horario(update, context):
 
     # Obtém a hora e o fuso horário atual
     now = datetime.now()
-    tz = pytz.timezone('America/Sao_Paulo')  # Você pode ajustar o fuso horário conforme necessário
+    tz = pytz.timezone('America/Maceio')  # Ajuste para o fuso horário de Maceió
     hora_atual = now.astimezone(tz).strftime("%H:%M:%S")
     periodo_dia = get_periodo_dia(now.hour)
-    localizacao = get_localizacao(now, tz)
+    localizacao = get_localizacao(tz)
 
     # Envia a mensagem com a hora e o fuso horário
     context.bot.send_message(chat_id, "{}, agora são {} {} do {}.".format(name, hora_atual, periodo_dia, localizacao))
@@ -33,19 +33,19 @@ def handle_greeting(update, context):
     # Enviando a mensagem de saudação personalizada com as opções de atendimento
     context.bot.send_message(chat_id, "Oi {}, se você está me acionando é porque precisa de alguma ajuda, não é mesmo?".format(name), parse_mode="html", disable_web_page_preview=True)
     context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
-    context.bot.send_message(chat_id, "/ajuda - Quero ajuda")
-    context.bot.send_message(chat_id, "/contato - Fale com o chefe")
-    context.bot.send_message(chat_id, "/horario - Que horas são?")
+    context.bot.send_message(chat_id, "/ajuda - Tô ferrado(a)")
+    context.bot.send_message(chat_id, "/contato - Quero falar com o boss")
+    context.bot.send_message(chat_id, "/horario - Tô perdido na hora")
 
 # Função de ajuda
 def handle_help(update, context):
     chat_id = update.effective_chat.id
-    context.bot.send_message(chat_id, "Opa,então você quer uma ajudinha, não é mesmo?")
-  
+    context.bot.send_message(chat_id, "Então você quer uma ajudinha, não é mesmo?")
+
 # Função de contato
 def handle_contact(update, context):
     chat_id = update.effective_chat.id
-    context.bot.send_message(chat_id, "Nesse caso, é melhor você falar com o boss, @arinelson.")
+    context.bot.send_message(chat_id, "Poxa, tente lá e veja se o chefe te responde: @arinelson")
 
 # Função para obter o período do dia
 def get_periodo_dia(hour):
@@ -57,7 +57,7 @@ def get_periodo_dia(hour):
         return "da noite"
 
 # Função para obter a localização com base no fuso horário
-def get_localizacao(now, tz):
+def get_localizacao(tz):
     localizacao = tz.zone
     return localizacao
 
