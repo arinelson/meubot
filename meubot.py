@@ -9,15 +9,21 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 # Variáveis globais
-TOKEN = "YOUR_BOT_TOKEN"
+TOKEN = "6942272197:AAE8kJKRkz_y3CbOgGzXl_ocVlnrvG51MM0"
 
 # Informações específicas de localização
-PAIS = "Brasil"
-ESTADO = "Alagoas"
-MUNICIPIO = "Maceió"
+localizacao = {
+    "PAIS": "Brasil",
+    "ESTADO": "Alagoas",
+    "MUNICIPIO": "Maceió",
+}
 
 # Criação do cache com uma capacidade de 1 item e tempo de vida de 60 segundos
 cache = TTLCache(maxsize=1, ttl=60)
+
+# Função para enviar mensagens
+def enviar_mensagem(chat_id, mensagem):
+    context.bot.send_message(chat_id, mensagem)
 
 # Função para exibir a hora e o fuso horário atual
 def handle_horario(update, context):
@@ -35,35 +41,43 @@ def handle_horario(update, context):
         periodo_dia = get_periodo_dia(now.hour)
 
         # Monta a resposta
-        response = "{}, agora são {} {} do {}, {}, {}.".format(name, hora_atual, periodo_dia, PAIS, ESTADO, MUNICIPIO)
+        response = f"{name}, agora são {hora_atual} {periodo_dia} do {localizacao['PAIS']}, {localizacao['ESTADO']}, {localizacao['MUNICIPIO']}."
 
         # Armazena a resposta no cache
         cache["horario"] = response
 
     # Envia a mensagem com a hora e o fuso horário
-    context.bot.send_message(chat_id, response)
+    enviar_mensagem(chat_id, response)
 
 # Funções de saudação e ajuda
 def handle_greeting(update, context):
     chat_id = update.effective_chat.id
     name = update.effective_user.first_name
 
-    # Enviando a mensagem de saudação personalizada com as opções de atendimento
-    context.bot.send_message(chat_id, "Oi {}, se você está me acionando é porque precisa de alguma ajuda, não é mesmo?".format(name), parse_mode="html", disable_web_page_preview=True)
-    context.bot.send_message(chat_id, "Aqui estão as opções de atendimento do meu bot:")
-    context.bot.send_message(chat_id, "/ajuda - Tô ferrado(a)")
-    context.bot.send_message(chat_id, "/contato - Quero falar com o boss")
-    context.bot.send_message(chat_id, "/horario - Tô perdido na hora")
+    # Mensagem de saudação
+    saudacao = "Oi {name}, se você está me acionando é porque precisa de algo, não é mesmo?"
+
+    # Mensagens de opções
+    opcoes = [
+        "/ajuda - Tô ferrado(a)",
+        "/contato - Quero falar com o boss",
+        "/horario - Tô perdido na hora",
+    ]
+
+    # Envia as mensagens
+    enviar_mensagem(chat_id, saudacao)
+    for opcao in opcoes:
+        enviar_mensagem(chat_id, opcao)
 
 # Função de ajuda
 def handle_help(update, context):
     chat_id = update.effective_chat.id
-    context.bot.send_message(chat_id, "Então você quer uma ajudinha, não é mesmo?")
+    enviar_mensagem(chat_id, "Então você quer uma ajudinha, não é mesmo?")
 
 # Função de contato
 def handle_contact(update, context):
     chat_id = update.effective_chat.id
-    context.bot.send_message(chat_id, "Poxa, tente lá e veja se o chefe te responde: @arinelson")
+    enviar_mensagem(chat_id, "Poxa, tente lá e veja se o chefe te responde: @arinelson")
 
 # Função para obter o período do dia
 def get_periodo_dia(hour):
