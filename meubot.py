@@ -9,17 +9,16 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 # Variáveis globais
-TOKEN = "6942272197:AAE8kJKRkz_y3CbOgGzXl_ocVlnrvG51MM0"
+TOKEN = "YOUR_BOT_TOKEN"
 
-# Criação do cache com uma capacidade de 1 item e tempo de vida de 6 segundos
-cache = TTLCache(maxsize=1, ttl=6)
+# Criação do cache com uma capacidade de 1 item e tempo de vida de 60 segundos
+cache = TTLCache(maxsize=1, ttl=30)
 
 # Função para enviar mensagens
 def enviar_mensagem(chat_id, mensagem, context):
     try:
         context.bot.send_message(chat_id, mensagem)
     except Exception as e:
-        # Tratamento de erro ao enviar mensagem
         logger.error(f"Erro ao enviar mensagem: {e}")
 
 # Função para exibir a hora e o fuso horário atual
@@ -53,7 +52,6 @@ def handle_horario(update, context):
             # Armazena a resposta no cache
             cache["horario"] = response
         except Exception as e:
-            # Tratamento de erro ao processar o horário
             logger.error(f"Erro ao processar o horário: {e}")
             response = "Desculpe, ocorreu um erro ao obter o horário."
 
@@ -73,6 +71,7 @@ def handle_greeting(update, context):
         "/ajuda - Tô ferrado(a)",
         "/contato - Quero falar com o boss",
         "/horario - Tô perdido na hora",
+        "/outrocomando - Este é outro comando!",
     ]
 
     # Envia as mensagens
@@ -90,14 +89,15 @@ def handle_contato(update, context):
     chat_id = update.effective_chat.id
     enviar_mensagem(chat_id, "Quer falar com o chefe? Tente lá: @arinelson", context)
 
-# Função para obter o período do dia
-def get_periodo_dia(hour):
-    if 5 <= hour < 12:
-        return "da manhã"
-    elif 12 <= hour < 18:
-        return "da tarde"
-    else:
-        return "da noite"
+# Função para outro comando
+def handle_outro_comando(update, context):
+    chat_id = update.effective_chat.id
+    enviar_mensagem(chat_id, "Este é outro comando!")
+
+# Manipulador para mensagens de texto não relacionadas a comandos
+def handle_mensagem(update, context):
+    chat_id = update.effective_chat.id
+    enviar_mensagem(chat_id, "Não entendi essa mensagem.", context)
 
 # Inicia o bot
 updater = Updater(token=TOKEN)
@@ -107,7 +107,8 @@ dispatcher = updater.dispatcher
 dispatcher.add_handler(CommandHandler("horario", handle_horario))
 dispatcher.add_handler(CommandHandler("ajuda", handle_ajuda))
 dispatcher.add_handler(CommandHandler("contato", handle_contato))
-# Restante dos handlers...
+dispatcher.add_handler(CommandHandler("outrocomando", handle_outro_comando))
+dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_mensagem))
 
 # Inicia o polling
 updater.start_polling()
