@@ -19,7 +19,7 @@ localizacao = {
 }
 
 # Criação do cache com uma capacidade de 1 item e tempo de vida de 60 segundos
-cache = TTLCache(maxsize=1, ttl=15)
+cache = TTLCache(maxsize=1, ttl=60)
 
 # Função para enviar mensagens
 def enviar_mensagem(chat_id, mensagem):
@@ -70,6 +70,24 @@ def handle_greeting(update, context):
     for opcao in opcoes:
         enviar_mensagem(chat_id, opcao)
 
+# Função de boas-vindas
+def handle_start(update, context):
+    chat_id = update.effective_chat.id
+    name = update.effective_user.first_name
+
+    # Mensagem de boas-vindas
+    boas_vindas = f"Oi {name}! Eu sou o seu assistente virtual. Aqui estão algumas coisas que eu posso fazer por você:"
+    opcoes = [
+        "/ajuda - Mostra as opções de ajuda",
+        "/contato - Envia uma mensagem para o administrador",
+        "/horario - Mostra a hora atual",
+    ]
+
+    # Envia a mensagem de boas-vindas
+    enviar_mensagem(chat_id, boas_vindas)
+    for opcao in opcoes:
+        enviar_mensagem(chat_id, opcao)
+
 # Função de ajuda
 def handle_help(update, context):
     chat_id = update.effective_chat.id
@@ -94,6 +112,7 @@ updater = Updater(token=TOKEN)
 dispatcher = updater.dispatcher
 
 # Adiciona os handlers
+dispatcher.add_handler(CommandHandler("start", handle_start))
 dispatcher.add_handler(CommandHandler("ajuda", handle_help))
 dispatcher.add_handler(CommandHandler("contato", handle_contact))
 dispatcher.add_handler(CommandHandler("horario", handle_horario))
