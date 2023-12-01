@@ -3,6 +3,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 from datetime import datetime
 import pytz
 from cachetools import TTLCache
+from telegram import TelegramError
 
 # Configuração de logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -23,9 +24,13 @@ cache = TTLCache(maxsize=1, ttl=60)
 
 # Função para enviar mensagens
 def enviar_mensagem(chat_id, mensagem):
-    logger.info("Enviando mensagem para o chat_id: %s", chat_id)
-    context.bot.send_message(chat_id, mensagem)
-    logger.info("Mensagem enviada com sucesso.")
+    try:
+        # Sua lógica de envio de mensagem aqui
+        logger.info("Enviando mensagem para o chat_id: %s", chat_id)
+        context.bot.send_message(chat_id, mensagem)
+        logger.info("Mensagem enviada com sucesso.")
+    except TelegramError as e:
+        logger.error(f"Erro ao enviar mensagem: {e}")
 
 # Função para exibir a hora e o fuso horário atual
 def handle_horario(update, context):
@@ -112,3 +117,13 @@ def get_periodo_dia(hour):
 # Inicia o bot
 updater = Updater(token=TOKEN)
 dispatcher = updater
+
+# Adiciona os handlers
+dispatcher.add_handler(CommandHandler("ajuda", handle_help))
+dispatcher.add_handler(CommandHandler("contato", handle_contact))
+dispatcher.add_handler(CommandHandler("horario", handle_horario))
+dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_greeting))
+
+# Inicia o polling
+updater.start_polling()
+updater.idle()
