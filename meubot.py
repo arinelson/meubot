@@ -116,7 +116,7 @@ def get_periodo_dia(hour):
 
 # Inicia o bot
 updater = Updater(token=TOKEN)
-dispatcher = updater
+dispatcher = updater.dispatcher
 
 # Adiciona os handlers
 dispatcher.add_handler(CommandHandler("ajuda", handle_help))
